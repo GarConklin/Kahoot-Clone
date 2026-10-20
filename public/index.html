@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab Legends</title>
+<style>
+:root{--bg:#090d1c;--panel:#141b31;--panel2:#1d2743;--ink:#f4f7ff;--muted:#aab6d3;--cyan:#38d9ff;--pink:#ff4fc8;--gold:#ffd166;--green:#5df2a1;--red:#ff657a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#202a53 0,#090d1c 55%);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,sans-serif;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 4vw;border-bottom:1px solid #ffffff18} .logo{font-weight:950;letter-spacing:1.5px;font-size:clamp(20px,3vw,30px)}.logo span{color:var(--cyan)}.tag{color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase}
+main{max-width:1100px;margin:0 auto;padding:28px 18px 60px}.hero{text-align:center;padding:20px 0 28px}.hero h1{font-size:clamp(34px,6vw,64px);margin:8px 0;line-height:1}.hero p{color:var(--muted);font-size:17px}.glow{color:var(--cyan);text-shadow:0 0 25px #38d9ff55}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.panel{background:linear-gradient(145deg,#18213b,#10162a);border:1px solid #ffffff18;border-radius:20px;padding:22px;box-shadow:0 15px 45px #0003}.panel h2,.panel h3{margin-top:0}.muted{color:var(--muted)}button,input{font:inherit}input{width:100%;background:#080d1a;border:1px solid #394667;color:white;border-radius:12px;padding:13px;margin:6px 0 14px;outline:none}input:focus{border-color:var(--cyan)}button{border:0;border-radius:12px;padding:13px 16px;font-weight:800;cursor:pointer;transition:transform .12s,filter .12s}button:hover{filter:brightness(1.12);transform:translateY(-1px)}button:disabled{opacity:.4;cursor:not-allowed;transform:none}.primary{background:linear-gradient(90deg,var(--cyan),#7af0d2);color:#071020}.secondary{background:#273351;color:white;border:1px solid #ffffff20}.danger{background:#54243b;color:white}.hidden{display:none!important}.pin{font-size:clamp(40px,8vw,72px);font-weight:1000;letter-spacing:8px;color:var(--gold)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.stat{background:#080d1a99;border-radius:12px;padding:12px;flex:1;min-width:90px}.stat b{display:block;font-size:24px}.answer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}.answer{min-height:85px;text-align:left;color:white;font-size:clamp(15px,2vw,20px);border:2px solid transparent}.answer:nth-child(1){background:#d94361}.answer:nth-child(2){background:#2679e8}.answer:nth-child(3){background:#d99519;color:#15101a}.answer:nth-child(4){background:#168d70}.answer.selected{outline:4px solid white;outline-offset:2px}.answer small{display:block;opacity:.8;font-size:12px;margin-bottom:5px}.question{font-size:clamp(24px,4vw,42px);line-height:1.15;font-weight:900;margin:20px 0}.bar{height:8px;border-radius:9px;background:#ffffff16;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));width:0}.player{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #ffffff12}.rank{font-size:22px;width:36px;color:var(--gold);font-weight:900}.player-name{flex:1;font-weight:750}.score{font-weight:900;color:var(--green)}.message{padding:12px;border-radius:12px;background:#ffffff0c;color:var(--muted);margin:10px 0}.notice{color:var(--gold);font-weight:700}.foot{text-align:center;color:#7180a5;font-size:12px;margin-top:28px}
+@media(max-width:560px){main{padding:16px 12px}.panel{padding:17px}.answer-grid{grid-template-columns:1fr}.answer{min-height:64px}header{padding:14px 16px}}
+</style></head><body>
+<header><div class="logo">LAB <span>LEGENDS</span></div><div class="tag">Virtualization Challenge</div></header>
+<main>
+<section id="home">
+<div class="hero"><div class="tag">CLASSROOM ARCADE · SEASON 01</div><h1>Build. Break.<br><span class="glow">Troubleshoot.</span></h1><p>Can your team keep the virtual datacenter alive?</p></div>
+<div class="grid">
+<div class="panel"><h2>🎮 Host a game</h2><p class="muted">Project the instructor screen, start the round, reveal answers, and run the leaderboard.</p><button class="primary" id="hostBtn">Launch instructor console</button></div>
+<div class="panel"><h2>📱 Join a game</h2><p class="muted">Enter the PIN shown on the classroom screen. Up to 9 players or teams.</p><label>Room PIN</label><input id="pinInput" inputmode="numeric" maxlength="4" placeholder="1234"><label>Player or team name</label><input id="nameInput" maxlength="22" placeholder="e.g. Packet Pirates"><button class="primary" id="joinBtn">Join the challenge</button><div id="joinError" class="notice"></div></div>
+</div><div class="foot">Best played on your trusted classroom Wi-Fi · No student accounts required</div>
+</section>
+<section id="host" class="hidden">
+<div class="row between"><div><div class="tag">INSTRUCTOR CONSOLE</div><h1>Room <span id="hostPin" class="glow"></span></h1></div><button class="secondary" id="homeBtn">Exit</button></div>
+<div class="grid">
+<div class="panel"><div class="tag">JOIN AT</div><h2 id="joinUrl">http://SERVER-IP:3000</h2><p class="muted">Students enter this room PIN on their phones or laptops.</p><div class="tag">ROOM PIN</div><div id="bigPin" class="pin">----</div><div class="row"><div class="stat"><span class="muted">Players</span><b id="playerCount">0/9</b></div><div class="stat"><span class="muted">Question</span><b id="hostProgress">Lobby</b></div></div><div id="hostControls" class="row" style="margin-top:18px"><button class="primary" id="startBtn">Start game</button><button class="secondary" id="resetBtn">Reset scores</button></div></div>
+<div class="panel"><h2>🏆 Live leaderboard</h2><div id="hostBoard" class="muted">Waiting for players to join…</div></div>
+</div>
+<div id="hostQuestionPanel" class="panel hidden" style="margin-top:16px"><div class="row between"><span class="tag" id="hostRound">CHALLENGE</span><span class="notice" id="answeredCount">0 answered</span></div><div class="question" id="hostQuestion"></div><div id="hostAnswers" class="answer-grid"></div><div id="revealBox" class="message hidden"></div><div class="row" style="margin-top:18px"><button class="primary" id="revealBtn">Reveal answer</button><button class="primary hidden" id="nextBtn">Next question →</button></div></div>
+</section>
+<section id="player" class="hidden">
+<div class="row between"><div><div class="tag">CONNECTED PLAYER</div><h2 id="playerName"></h2></div><div class="stat"><span class="muted">Your credits</span><b id="myScore">0</b></div></div>
+<div class="panel" id="playerLobby"><div class="hero"><div style="font-size:50px">🛰️</div><h2>You're in!</h2><p class="muted">Eyes on the big screen. The instructor will launch the challenge shortly.</p><div class="glow" style="font-size:22px;font-weight:900">STANDBY</div></div></div>
+<div class="panel hidden" id="playerQuestionPanel"><div class="row between"><span class="tag" id="playerRound">QUESTION</span><span class="notice" id="playerStatus">Choose wisely</span></div><div class="question" id="playerQuestion"></div><div id="playerAnswers" class="answer-grid"></div><div id="playerFeedback" class="message hidden"></div></div>
+<div class="panel hidden" id="playerFinished"><div class="hero"><div style="font-size:55px">🏆</div><h1>Challenge complete!</h1><p id="finalRank"></p></div></div>
+</section>
+</main>
+<script src="/socket.io/socket.io.js"></script><script>
+const socket=io();let role=null,pin=null,myId=null,selected=null,answered=false,lastState=null;
+const $=id=>document.getElementById(id);
+function show(id){["home","host","player"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function sendHost(action){socket.emit("host:action",{action},r=>{if(!r.ok)alert(r.error||"Action failed")})}
+function drawBoard(players,target){target.innerHTML="";if(!players.length){target.textContent="Waiting for players to join…";return}players.forEach((p,i)=>{const d=document.createElement("div");d.className="player";d.innerHTML=`<div class="rank">${i+1}</div><div class="player-name"></div><div class="score">${p.score.toLocaleString()} cr</div>`;d.querySelector(".player-name").textContent=p.name+(p.connected?"":" · reconnect");target.appendChild(d)})}
+$("hostBtn").onclick=()=>socket.emit("host:create",{},r=>{if(!r.ok)return alert("Could not create room");role="host";pin=r.pin;show("host");$("hostPin").textContent=pin;$("bigPin").textContent=pin;$("joinUrl").textContent=location.origin;});
+$("homeBtn").onclick=()=>{location.reload()};
+$("joinBtn").onclick=()=>{const pin=$("pinInput").value.trim(),name=$("nameInput").value.trim();socket.emit("player:join",{pin,name},r=>{if(!r.ok){$("joinError").textContent=r.error;return}role="player";myId=socket.id;window.myName=name;window.myPin=pin;show("player");$("playerName").textContent=name;$("joinError").textContent=""})};
+$("startBtn").onclick=()=>sendHost("start");$("resetBtn").onclick=()=>{if(confirm("Reset all team scores and return to lobby?"))sendHost("reset")};$("revealBtn").onclick=()=>sendHost("reveal");$("nextBtn").onclick=()=>sendHost("next");
+function makeAnswers(target,answers,multi,interactive,onSelect){target.innerHTML="";answers.forEach((a,i)=>{const b=document.createElement("button");b.className="answer";b.innerHTML=`<small>${["▲","◆","●","■"][i]||"•"} · OPTION ${i+1}</small>`;const span=document.createElement("span");span.textContent=a;b.appendChild(span);b.onclick=()=>onSelect(i,b);b.disabled=!interactive;target.appendChild(b)})}
+socket.on("sync",s=>{
+ if(role==="host"&&s.pin!==pin)return;if(role==="player"&&s.pin!==window.myPin)return;
+ lastState=s;
+ if(role==="host"){
+  $("playerCount").textContent=s.players.length+"/9";$("hostProgress").textContent=s.state==="lobby"?"Lobby":s.state==="finished"?"Finished":`${s.index+1}/${s.total}`;drawBoard(s.players,$("hostBoard"));
+  $("startBtn").classList.toggle("hidden",s.state!=="lobby");$("resetBtn").classList.toggle("hidden",s.state!=="finished"&&s.state!=="lobby");
+  $("hostQuestionPanel").classList.toggle("hidden",!["question","reveal"].includes(s.state));
+  if(s.state==="question"||s.state==="reveal"){
+   $("hostRound").textContent=`ROUND ${Math.floor(s.index/5)+1} · ${s.index<5?"BUILD THE LAB":s.index<10?"NETWORK MAYHEM":s.index<15?"STORAGE WARS":s.index<20?"RESOURCE RUSH":s.index<25?"FINAL BOSS":"TEST REVIEW ROUND"}`;
+   $("hostQuestion").textContent=s.question.q;$("answeredCount").textContent=`${s.answered}/${s.players.length} answered`;
+   if(s.state==="question"){const qNow=s.question; // choices are kept on host by asking server for public choices in question state
+    $("hostAnswers").innerHTML='<div class="message">Students are answering on their devices…</div>';
+    $("revealBtn").classList.remove("hidden");$("nextBtn").classList.add("hidden");$("revealBox").classList.add("hidden");
+   }else{
+    makeAnswers($("hostAnswers"),s.question.a,false,false,()=>{});
+    const corr=Array.isArray(s.question.correct)?s.question.correct:[s.question.correct];
+    $("hostAnswers").querySelectorAll(".answer").forEach((el,i)=>{if(corr.includes(i)){el.style.outline="3px solid var(--green)";el.style.opacity="1";}});
+    $("hostAnswers").querySelectorAll(".answer").forEach((el,i)=>{el.style.opacity=".8";el.style.outline=s.answerCounts&&s.answerCounts[i]?"2px solid var(--gold)":""});
+    $("revealBtn").classList.add("hidden");$("nextBtn").classList.remove("hidden");$("revealBox").classList.remove("hidden");$("revealBox").textContent="Answer revealed. "+s.question.why;
+    const correct=s.question.a; // correct choice text is announced separately in reveal metadata in v1 below
+   }
+  }
+  if(s.state==="finished"){ $("hostQuestionPanel").classList.remove("hidden");$("hostQuestion").textContent="🏆 Datacenter secured!";$("hostAnswers").innerHTML="";$("revealBtn").classList.add("hidden");$("nextBtn").classList.add("hidden");$("revealBox").classList.remove("hidden");$("revealBox").textContent=s.winner?`Winner: ${s.winner.name} with ${s.winner.score.toLocaleString()} credits!`:"Game complete."}
+ }
+ if(role==="player"){
+  const me=s.players.find(p=>p.id===myId);if(me)$("myScore").textContent=me.score.toLocaleString();
+  $("playerLobby").classList.toggle("hidden",s.state!=="lobby");$("playerQuestionPanel").classList.toggle("hidden",!["question","reveal"].includes(s.state));$("playerFinished").classList.toggle("hidden",s.state!=="finished");
+  if(s.state==="question"||s.state==="reveal"){
+   $("playerRound").textContent=`ROUND ${Math.floor(s.index/5)+1} · QUESTION ${s.index+1}/${s.total}`;$("playerQuestion").textContent=s.question.q;
+   if(s.state==="question" && (selected!==s.index)){selected=s.index;answered=false;$("playerStatus").textContent="Choose your answer";$("playerFeedback").classList.add("hidden");}
+   if(s.state==="question" && !answered){
+    // Choices are transmitted to students only while the question is live.
+    socket.emit("player:getChoices",{},()=>{});
+    if(window.currentQuestionIndex!==s.index){window.currentQuestionIndex=s.index;drawPlayerAnswers(s.question.a||[]);}
+   }
+   if(s.state==="reveal"){$("playerStatus").textContent="Answer revealed";$("playerFeedback").classList.remove("hidden");const corr=Array.isArray(s.question.correct)?s.question.correct:[s.question.correct];$("playerFeedback").textContent="Correct answer: "+corr.map(i=>s.question.a[i]).join(", ")+". "+s.question.why;$("playerAnswers").querySelectorAll("button").forEach(b=>b.disabled=true)}
+  }
+  if(s.state==="finished"){const sorted=[...s.players].sort((a,b)=>b.score-a.score);const rank=sorted.findIndex(p=>p.id===myId)+1;$("finalRank").textContent=`You finished #${rank} with ${me?me.score:0} credits.`}
+ }
+});
+function drawPlayerAnswers(answers){makeAnswers($("playerAnswers"),answers,false,true,(i,b)=>{if(answered)return;answered=true;socket.emit("player:answer",{value:i},r=>{if(!r.ok){$("playerStatus").textContent=r.error||"Answer not accepted";return} $("playerStatus").textContent="Answer locked! Waiting for reveal.";});$("playerAnswers").querySelectorAll("button").forEach(x=>x.disabled=true);b.classList.add("selected")})}
+</script></body></html>

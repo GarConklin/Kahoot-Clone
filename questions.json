@@ -1,0 +1,333 @@
+[
+  {
+    "q": "You want to install Proxmox inside a VM on ACE. Which setting must be enabled?",
+    "a": [
+      "Expose hardware-assisted virtualization",
+      "Enable shared folders",
+      "Add a VLAN tag",
+      "Format the disk as NTFS"
+    ],
+    "correct": 0,
+    "why": "Nested Proxmox needs hardware-assisted virtualization exposed to the guest."
+  },
+  {
+    "q": "Which network mode did the VirtualBox Ubuntu lab specify for internet access?",
+    "a": [
+      "Host-only",
+      "NAT",
+      "Internal Network",
+      "Disconnected"
+    ],
+    "correct": 1,
+    "why": "The lab specifies NAT for the Ubuntu VM's network adapter."
+  },
+  {
+    "q": "Which shortcut did the Windows Server lab use to enter Audit Mode at the initial setup screen?",
+    "a": [
+      "Ctrl + Alt + Delete",
+      "Alt + F4",
+      "Ctrl + Shift + F3",
+      "Windows + R"
+    ],
+    "correct": 2,
+    "why": "Ctrl + Shift + F3 enters Audit Mode during the initial Windows setup experience."
+  },
+  {
+    "q": "You want a reusable standardized starting point for making more Windows Server VMs. What should you create?",
+    "a": [
+      "A VLAN-aware bridge",
+      "A storage pool",
+      "A snapshot only",
+      "A VM template"
+    ],
+    "correct": 3,
+    "why": "The lab creates a Windows Server template and then clones from it."
+  },
+  {
+    "q": "A new virtual disk appears in Windows but cannot store files yet. What is the next step?",
+    "a": [
+      "Initialize it, create a volume, format NTFS, assign a drive letter",
+      "Convert it to a VLAN",
+      "Create a template immediately",
+      "Change the VM to bridged networking"
+    ],
+    "correct": 0,
+    "why": "The disk must be initialized, partitioned/formatted, and assigned a drive letter."
+  },
+  {
+    "q": "True or false: A Proxmox virtual bridge can act like a switch connecting VMs to each other or an external network when configured appropriately.",
+    "a": [
+      "True",
+      "False"
+    ],
+    "correct": 0,
+    "why": "The lab describes bridges as switch-like connections for VM networking."
+  },
+  {
+    "q": "For internal-only vmbr1 in Lab 3b, what IPv4/CIDR setting is specified?",
+    "a": [
+      "192.168.100.1/24",
+      "Leave it blank",
+      "127.0.0.1/8",
+      "255.255.255.0 only"
+    ],
+    "correct": 1,
+    "why": "The lab says to leave IPv4/CIDR blank for internal network use."
+  },
+  {
+    "q": "Two VMs on an internal bridge have no DHCP server. What should you do?",
+    "a": [
+      "Reinstall Proxmox",
+      "Disable adapters",
+      "Assign static IPs in the same subnet",
+      "Increase both VMs to four CPU cores"
+    ],
+    "correct": 2,
+    "why": "The lab requires static IP addresses in the same subnet for this internal network."
+  },
+  {
+    "q": "Which command tests connectivity between two VMs?",
+    "a": [
+      "format",
+      "sysprep",
+      "diskpart",
+      "ping"
+    ],
+    "correct": 3,
+    "why": "The lab asks students to ping between the VMs."
+  },
+  {
+    "q": "Which Proxmox bridge is configured for VLAN tagging in Lab 3b?",
+    "a": [
+      "vmbr2 with VLAN-aware enabled",
+      "vmbr1 with blank IPv4/CIDR",
+      "A bridge with adapters removed",
+      "A bridge with a drive letter"
+    ],
+    "correct": 0,
+    "why": "The lab specifies vmbr2 with VLAN-aware checked."
+  },
+  {
+    "q": "Which item is NOT one of the three storage technologies covered in your Proxmox storage lab?",
+    "a": [
+      "DAS (Direct-Attached Storage)",
+      "NAS (Network-Attached Storage)",
+      "SAN (Storage Area Network)",
+      "DNS (Domain Name System)"
+    ],
+    "correct": 3,
+    "why": "The lab covers DAS, NAS, and SAN. DNS resolves names and is not a storage technology."
+  },
+  {
+    "q": "Which filesystem does the Proxmox local-das directory-storage exercise specify?",
+    "a": [
+      "NTFS",
+      "ext4",
+      "FAT32",
+      "exFAT"
+    ],
+    "correct": 1,
+    "why": "The lab specifies ext4 for local-das."
+  },
+  {
+    "q": "Which feature lets a VM access a folder on the host computer?",
+    "a": [
+      "A VLAN tag",
+      "CPU overcommit",
+      "A shared folder",
+      "A VM snapshot"
+    ],
+    "correct": 2,
+    "why": "The lab configures shared folders and accesses them from the guest."
+  },
+  {
+    "q": "True or false: Assigning more vCPUs to a VM always improves performance.",
+    "a": [
+      "True",
+      "False"
+    ],
+    "correct": 1,
+    "why": "Extra vCPUs can hurt performance depending on host resources and CPU contention."
+  },
+  {
+    "q": "Which configuration matches the suggested lightweight Puppy Linux VM in Proxmox?",
+    "a": [
+      "1 GB disk, 1 CPU core, 512 MB\u20131 GB RAM",
+      "32 GB disk, 4 cores, 8 GB RAM",
+      "20 GB disk, 4 cores, 4 GB RAM",
+      "60 GB disk, 2 cores, 4 GB RAM"
+    ],
+    "correct": 0,
+    "why": "The assignment suggests a 1 GB disk, 1 core, and 512 MB\u20131 GB RAM."
+  },
+  {
+    "q": "What is memory ballooning used for?",
+    "a": [
+      "Data deduplication",
+      "Reclaiming unused memory from a VM when needed elsewhere",
+      "Thin provisioning storage",
+      "VLAN tagging"
+    ],
+    "correct": 1,
+    "why": "Ballooning reclaims unused guest memory when the host needs it elsewhere."
+  },
+  {
+    "q": "A VM is allocated 4 GB of RAM. What can its guest OS use under that allocation?",
+    "a": [
+      "All host RAM automatically",
+      "Only 512 MB",
+      "Exactly twice the allocation",
+      "The memory allocated to the VM, subject to its configuration"
+    ],
+    "correct": 3,
+    "why": "A VM sees and uses the memory allocated to it, subject to its configuration."
+  },
+  {
+    "q": "Which storage technique replaces duplicate entities with pointers to the original?",
+    "a": [
+      "Memory ballooning",
+      "CPU scheduling",
+      "Data deduplication",
+      "Bridged networking"
+    ],
+    "correct": 2,
+    "why": "The storage slides describe deduplication as replacing duplicates with pointers to original data."
+  },
+  {
+    "q": "What is the key trade-off with thin provisioning?",
+    "a": [
+      "All disk space is reserved immediately",
+      "Space is not fully pre-allocated, so actual storage use must be monitored",
+      "The VM can never run out of storage",
+      "It doubles the VM's CPU count"
+    ],
+    "correct": 1,
+    "why": "Thin provisioning does not pre-allocate all capacity, but underlying storage can fill."
+  },
+  {
+    "q": "VirtualBox is which type of hypervisor in your course material?",
+    "a": [
+      "Type 1, running directly on hardware",
+      "A guest OS inside Ubuntu",
+      "Type 2, running on a host operating system",
+      "A Proxmox storage protocol"
+    ],
+    "correct": 2,
+    "why": "The course slides classify VirtualBox as a Type 2 hypervisor."
+  },
+  {
+    "q": "Your Proxmox web interface uses which port in the lab's example URL?",
+    "a": [
+      "22",
+      "80",
+      "443",
+      "8006"
+    ],
+    "correct": 3,
+    "why": "The Proxmox web interface is shown at https://IP:8006."
+  },
+  {
+    "q": "You need to upload a Linux ISO into Proxmox before creating a VM. Where does the lab direct you?",
+    "a": [
+      "Node > Local storage > ISO Images > Upload",
+      "VM > Hardware > Add CPU",
+      "Datacenter > Users > Permissions",
+      "Node > Network > VLAN"
+    ],
+    "correct": 0,
+    "why": "The assignment uploads the ISO through Local storage's ISO Images tab."
+  },
+  {
+    "q": "In the Windows virtual disk lab, which partition style did the initialization prompt specify?",
+    "a": [
+      "MBR only",
+      "GPT",
+      "ext4",
+      "LVM"
+    ],
+    "correct": 1,
+    "why": "The lab says to select GPT when initializing the new disk."
+  },
+  {
+    "q": "A host folder is shared with a VirtualBox Windows guest. Which path format does the lab give for accessing a shared folder?",
+    "a": [
+      "\\\\vmware-host\\Shared Folders\\name only",
+      "C:\\\\Windows\\\\System32 only",
+      "\\\\vboxsrv\\shared_folder_name",
+      "https://vboxsrv/share"
+    ],
+    "correct": 2,
+    "why": "The lab gives the VirtualBox shared-folder path as \\\\vboxsrv\\[shared_folder_name]."
+  },
+  {
+    "q": "A VM is slow and the host is experiencing CPU contention. What is the best first principle from the CPU slides?",
+    "a": [
+      "Always assign the maximum vCPUs",
+      "Add vCPUs to every VM immediately",
+      "Ignore physical CPU capacity",
+      "Start with a modest vCPU allocation and increase only if needed"
+    ],
+    "correct": 3,
+    "why": "The slides recommend starting with one vCPU and increasing if needed; more vCPUs are not always better."
+  },
+  {
+    "q": "Which Microsoft utility is used to automate customization of a Windows Server installation?",
+    "a": [
+      "Sysprep",
+      "Windows Update",
+      "PowerToys",
+      "Azure Automanage"
+    ],
+    "correct": 0,
+    "why": "The Test-1 questions identify Sysprep as the Microsoft utility used to automate Windows Server customization.",
+    "topic": "TEST REVIEW"
+  },
+  {
+    "q": "What is the default port number for the Proxmox web interface?",
+    "a": [
+      "8003",
+      "8006",
+      "8080",
+      "80"
+    ],
+    "correct": 1,
+    "why": "The Test-1 questions identify port 8006 as the default Proxmox web-interface port.",
+    "topic": "TEST REVIEW"
+  },
+  {
+    "q": "Which statement describes a Type 1 hypervisor?",
+    "a": [
+      "It runs on top of a host operating system",
+      "It runs directly on the server hardware",
+      "It is a virtual disk format",
+      "It only supports desktop applications"
+    ],
+    "correct": 1,
+    "why": "The Test-1 questions distinguish Type 1 hypervisors as running directly on server hardware.",
+    "topic": "TEST REVIEW"
+  },
+  {
+    "q": "Which feature lets you return a virtual machine to an earlier point in time?",
+    "a": [
+      "Clones",
+      "Snapshots",
+      "Templates",
+      "Appliances"
+    ],
+    "correct": 1,
+    "why": "The Test-1 questions identify snapshots as the feature for returning a VM to a prior state.",
+    "topic": "TEST REVIEW"
+  },
+  {
+    "q": "In a bridged network configuration, how do virtual machines appear on the network?",
+    "a": [
+      "They can have unique IP addresses visible to the external network",
+      "They can communicate only with host services",
+      "They are always assigned a new IP after every reboot",
+      "They have no network address"
+    ],
+    "correct": 0,
+    "why": "The Test-1 questions describe bridged VMs as having unique network IP addresses visible from outside the host.",
+    "topic": "TEST REVIEW"
+  }
+]

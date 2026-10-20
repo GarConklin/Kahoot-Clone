@@ -1,0 +1,7 @@
+services:
+  lab-legends:
+    build: .
+    container_name: lab-legends
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
