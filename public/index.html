@@ -28,12 +28,12 @@ main{max-width:1100px;margin:0 auto;padding:28px 18px 60px}.hero{text-align:cent
 <section id="player" class="hidden">
 <div class="row between"><div><div class="tag">CONNECTED PLAYER</div><h2 id="playerName"></h2></div><div class="stat"><span class="muted">Your credits</span><b id="myScore">0</b></div></div>
 <div class="panel" id="playerLobby"><div class="hero"><div style="font-size:50px">🛰️</div><h2>You're in!</h2><p class="muted">Eyes on the big screen. The instructor will launch the challenge shortly.</p><div class="glow" style="font-size:22px;font-weight:900">STANDBY</div></div></div>
-<div class="panel hidden" id="playerQuestionPanel"><div class="row between"><span class="tag" id="playerRound">QUESTION</span><span class="notice" id="playerStatus">Choose wisely</span></div><div class="question" id="playerQuestion"></div><div id="playerAnswers" class="answer-grid"></div><div id="playerFeedback" class="message hidden"></div></div>
+<div class="panel hidden" id="playerQuestionPanel"><div class="row between"><span class="tag" id="playerRound">QUESTION</span><span class="notice" id="playerStatus">Choose wisely</span></div><div class="question" id="playerQuestion"></div><div id="playerAnswers" class="answer-grid"></div><div class="row" id="playerAnswerControls" style="margin-top:16px"><button class="primary" id="lockAnswerBtn" disabled>Lock In Answer</button><button class="secondary hidden" id="changeAnswerBtn">Change Answer</button></div><div id="playerFeedback" class="message hidden"></div></div>
 <div class="panel hidden" id="playerFinished"><div class="hero"><div style="font-size:55px">🏆</div><h1>Challenge complete!</h1><p id="finalRank"></p></div></div>
 </section>
 </main>
 <script src="/socket.io/socket.io.js"></script><script>
-const socket=io();let role=null,pin=null,myId=null,selected=null,answered=false,lastState=null;
+const socket=io();let role=null,pin=null,myId=null,selected=null,answered=false,pendingAnswer=null,lockedAnswer=null,lastState=null;
 const $=id=>document.getElementById(id);
 function show(id){["home","host","player"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
 function sendHost(action){socket.emit("host:action",{action},r=>{if(!r.ok)alert(r.error||"Action failed")})}
@@ -53,16 +53,19 @@ socket.on("sync",s=>{
   if(s.state==="question"||s.state==="reveal"){
    $("hostRound").textContent=`ROUND ${Math.floor(s.index/5)+1} · ${s.index<5?"BUILD THE LAB":s.index<10?"NETWORK MAYHEM":s.index<15?"STORAGE WARS":s.index<20?"RESOURCE RUSH":s.index<25?"FINAL BOSS":"TEST REVIEW ROUND"}`;
    $("hostQuestion").textContent=s.question.q;$("answeredCount").textContent=`${s.answered}/${s.players.length} answered`;
-   if(s.state==="question"){const qNow=s.question; // choices are kept on host by asking server for public choices in question state
-    $("hostAnswers").innerHTML='<div class="message">Students are answering on their devices…</div>';
+   if(s.state==="question"){
+    // Mirror the answer choices shown on student devices, but do not reveal which is correct.
+    makeAnswers($("hostAnswers"),s.question.a,false,false,()=>{});
     $("revealBtn").classList.remove("hidden");$("nextBtn").classList.add("hidden");$("revealBox").classList.add("hidden");
    }else{
     makeAnswers($("hostAnswers"),s.question.a,false,false,()=>{});
     const corr=Array.isArray(s.question.correct)?s.question.correct:[s.question.correct];
-    $("hostAnswers").querySelectorAll(".answer").forEach((el,i)=>{if(corr.includes(i)){el.style.outline="3px solid var(--green)";el.style.opacity="1";}});
-    $("hostAnswers").querySelectorAll(".answer").forEach((el,i)=>{el.style.opacity=".8";el.style.outline=s.answerCounts&&s.answerCounts[i]?"2px solid var(--gold)":""});
-    $("revealBtn").classList.add("hidden");$("nextBtn").classList.remove("hidden");$("revealBox").classList.remove("hidden");$("revealBox").textContent="Answer revealed. "+s.question.why;
-    const correct=s.question.a; // correct choice text is announced separately in reveal metadata in v1 below
+    $("hostAnswers").querySelectorAll(".answer").forEach((el,i)=>{
+      if(corr.includes(i)){el.style.outline="3px solid var(--green)";el.style.opacity="1";}
+      else {el.style.opacity=".72";el.style.outline="";}
+      if(s.answerCounts&&s.answerCounts[i]){el.querySelector("small").textContent += ` · ${s.answerCounts[i]} VOTE${s.answerCounts[i]===1?"":"S"}`;}
+    });
+    $("revealBtn").classList.add("hidden");$("nextBtn").classList.remove("hidden");$("revealBox").classList.remove("hidden");$("revealBox").textContent="Correct answer highlighted. "+s.question.why;
    }
   }
   if(s.state==="finished"){ $("hostQuestionPanel").classList.remove("hidden");$("hostQuestion").textContent="🏆 Datacenter secured!";$("hostAnswers").innerHTML="";$("revealBtn").classList.add("hidden");$("nextBtn").classList.add("hidden");$("revealBox").classList.remove("hidden");$("revealBox").textContent=s.winner?`Winner: ${s.winner.name} with ${s.winner.score.toLocaleString()} credits!`:"Game complete."}
@@ -71,17 +74,47 @@ socket.on("sync",s=>{
   const me=s.players.find(p=>p.id===myId);if(me)$("myScore").textContent=me.score.toLocaleString();
   $("playerLobby").classList.toggle("hidden",s.state!=="lobby");$("playerQuestionPanel").classList.toggle("hidden",!["question","reveal"].includes(s.state));$("playerFinished").classList.toggle("hidden",s.state!=="finished");
   if(s.state==="question"||s.state==="reveal"){
+   if(s.state==="question")$("playerAnswerControls").classList.remove("hidden");
    $("playerRound").textContent=`ROUND ${Math.floor(s.index/5)+1} · QUESTION ${s.index+1}/${s.total}`;$("playerQuestion").textContent=s.question.q;
-   if(s.state==="question" && (selected!==s.index)){selected=s.index;answered=false;$("playerStatus").textContent="Choose your answer";$("playerFeedback").classList.add("hidden");}
-   if(s.state==="question" && !answered){
-    // Choices are transmitted to students only while the question is live.
-    socket.emit("player:getChoices",{},()=>{});
+   if(s.state==="question" && (selected!==s.index)){selected=s.index;answered=false;pendingAnswer=null;lockedAnswer=null;$("playerStatus").textContent="Choose an answer, then lock it in.";$("playerFeedback").classList.add("hidden");$("lockAnswerBtn").disabled=true;$("changeAnswerBtn").classList.add("hidden");}
+   if(s.state==="question"){
+    // Keep the answer choices visible; allow an unlocked selection to be changed.
     if(window.currentQuestionIndex!==s.index){window.currentQuestionIndex=s.index;drawPlayerAnswers(s.question.a||[]);}
+    $("lockAnswerBtn").classList.toggle("hidden",answered);
+    $("changeAnswerBtn").classList.toggle("hidden",!answered);
+    $("playerAnswers").querySelectorAll("button").forEach((b,i)=>{b.disabled=answered; b.classList.toggle("selected",pendingAnswer===i || (answered && lockedAnswer===i));});
    }
-   if(s.state==="reveal"){$("playerStatus").textContent="Answer revealed";$("playerFeedback").classList.remove("hidden");const corr=Array.isArray(s.question.correct)?s.question.correct:[s.question.correct];$("playerFeedback").textContent="Correct answer: "+corr.map(i=>s.question.a[i]).join(", ")+". "+s.question.why;$("playerAnswers").querySelectorAll("button").forEach(b=>b.disabled=true)}
+   if(s.state==="reveal"){$("playerAnswerControls").classList.add("hidden");$("playerStatus").textContent="Answer revealed";$("playerFeedback").classList.remove("hidden");const corr=Array.isArray(s.question.correct)?s.question.correct:[s.question.correct];$("playerFeedback").textContent="Correct answer: "+corr.map(i=>s.question.a[i]).join(", ")+". "+s.question.why;$("playerAnswers").querySelectorAll("button").forEach(b=>b.disabled=true)}
   }
   if(s.state==="finished"){const sorted=[...s.players].sort((a,b)=>b.score-a.score);const rank=sorted.findIndex(p=>p.id===myId)+1;$("finalRank").textContent=`You finished #${rank} with ${me?me.score:0} credits.`}
  }
 });
-function drawPlayerAnswers(answers){makeAnswers($("playerAnswers"),answers,false,true,(i,b)=>{if(answered)return;answered=true;socket.emit("player:answer",{value:i},r=>{if(!r.ok){$("playerStatus").textContent=r.error||"Answer not accepted";return} $("playerStatus").textContent="Answer locked! Waiting for reveal.";});$("playerAnswers").querySelectorAll("button").forEach(x=>x.disabled=true);b.classList.add("selected")})}
+function drawPlayerAnswers(answers){
+  $("playerAnswerControls").classList.remove("hidden");
+  makeAnswers($("playerAnswers"),answers,false,true,(i,b)=>{
+    if(answered)return;
+    pendingAnswer=i;
+    $("lockAnswerBtn").disabled=false;
+    $("playerStatus").textContent="Answer selected. Lock it in when you're ready.";
+    $("playerAnswers").querySelectorAll("button").forEach((x,j)=>{x.classList.toggle("selected",j===i);});
+  });
+}
+$("lockAnswerBtn").onclick=()=>{
+  if(answered||pendingAnswer===null)return;
+  const choice=pendingAnswer;
+  socket.emit("player:answer",{value:choice},r=>{
+    if(!r.ok){$("playerStatus").textContent=r.error||"Answer not accepted";return;}
+    answered=true;lockedAnswer=choice;$("lockAnswerBtn").disabled=true;
+    $("playerStatus").textContent="Answer locked in! You can change it before the question closes.";
+    $("playerAnswers").querySelectorAll("button").forEach((x,j)=>{x.disabled=true;x.classList.toggle("selected",j===choice);});
+    $("changeAnswerBtn").classList.remove("hidden");
+  });
+};
+$("changeAnswerBtn").onclick=()=>{
+  if(!answered)return;
+  answered=false;pendingAnswer=lockedAnswer;$("lockAnswerBtn").disabled=true;
+  $("playerStatus").textContent="Unlocked. Choose another answer, then lock it in again.";
+  $("playerAnswers").querySelectorAll("button").forEach((x,j)=>{x.disabled=false;x.classList.toggle("selected",j===pendingAnswer);});
+  $("lockAnswerBtn").classList.remove("hidden");$("changeAnswerBtn").classList.add("hidden");
+};
 </script></body></html>

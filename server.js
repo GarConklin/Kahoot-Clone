@@ -68,7 +68,7 @@ io.on("connection", socket => {
   });
   socket.on("player:answer", ({value}, cb=()=>{}) => {
     const room=rooms.get(socket.data.pin); const id=socket.data.playerId;
-    if(!room||socket.data.role!=="player"||room.state!=="question"||room.answers.has(id)) return cb({ok:false,error:"Answer already locked or question not active."});
+    if(!room||socket.data.role!=="player"||room.state!=="question") return cb({ok:false,error:"Question is not active."});
     const started=room.questionStarted||Date.now(); const elapsed=Math.min(20000,Date.now()-started);
     room.answers.set(id,{value,elapsed}); broadcast(room); cb({ok:true});
   });
